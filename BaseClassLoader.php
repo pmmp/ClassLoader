@@ -103,12 +103,9 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 		$baseName = str_replace("\\", DIRECTORY_SEPARATOR, $name);
 
 		foreach($this->lookup as $path){
-			if(PHP_INT_SIZE === 8 and file_exists($path . DIRECTORY_SEPARATOR . $baseName . "__64bit.php")){
-				return $path . DIRECTORY_SEPARATOR . $baseName . "__64bit.php";
-			}elseif(PHP_INT_SIZE === 4 and file_exists($path . DIRECTORY_SEPARATOR . $baseName . "__32bit.php")){
-				return $path . DIRECTORY_SEPARATOR . $baseName . "__32bit.php";
-			}elseif(file_exists($path . DIRECTORY_SEPARATOR . $baseName . ".php")){
-				return $path . DIRECTORY_SEPARATOR . $baseName . ".php";
+			$filename = $path . DIRECTORY_SEPARATOR . $baseName . ".php";
+			if(file_exists($filename)){
+				return $filename;
 			}
 		}
 
