@@ -9,6 +9,6 @@
          "ext-reflection": "*"
     },
     "autoload": {
-        "classmap": ["./"]
+        "classmap": ["./src"]
     }
 }
