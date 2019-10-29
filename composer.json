@@ -9,7 +9,6 @@
          "ext-reflection": "*"
     },
     "autoload": {
-        "exclude-from-classmap": ["stubs"],
-        "classmap": ["./"]
+        "classmap": ["./src"]
     }
 }
