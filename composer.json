@@ -8,6 +8,9 @@
         "ext-pthreads": "~3.2.0",
         "ext-reflection": "*"
     },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.8"
+    },
     "autoload": {
         "classmap": ["./src"]
     }
