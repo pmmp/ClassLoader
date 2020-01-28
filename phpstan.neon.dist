@@ -1,0 +1,14 @@
+parameters:
+	level: 8
+	paths:
+		- src
+	ignoreErrors:
+		-
+			message: "#^Cannot access an offset on iterable\\<string\\>&Threaded\\.$#"
+			count: 2
+			path: src/BaseClassLoader.php
+
+		-
+			message: "#^Cannot access an offset on iterable\\<string\\>\\.$#"
+			count: 1
+			path: src/BaseClassLoader.php
