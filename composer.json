@@ -12,7 +12,7 @@
         "phpstan/phpstan": "^0.12.8"
     },
     "conflict": {
-	"pocketmine/spl": "<0.4"
+        "pocketmine/spl": "<0.4"
     },
     "autoload": {
         "classmap": ["./src"]
