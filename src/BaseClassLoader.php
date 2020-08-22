@@ -41,7 +41,7 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 		}
 
 		if($prepend){
-			$this->lookup->synchronized(function($path){
+			$this->lookup->synchronized(function(string $path) : void{
 				$entries = $this->getAndRemoveLookupEntries();
 				$this->lookup[] = $path;
 				foreach($entries as $entry){
