@@ -9,7 +9,7 @@
         "ext-reflection": "*"
     },
     "require-dev": {
-        "phpstan/phpstan": "0.12.48",
+        "phpstan/phpstan": "0.12.49",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-strict-rules": "^0.12.4"
     },
