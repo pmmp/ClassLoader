@@ -18,49 +18,65 @@
 class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 
 	/** @var \Threaded|string[] */
-	private $lookup;
+	private $fallbackLookup;
+	/** @var \Threaded|string[][] */
+	private $psr4Lookup;
 
 	public function __construct(){
-		$this->lookup = new \Threaded;
+		$this->fallbackLookup = new \Threaded;
+		$this->psr4Lookup = new \Threaded;
+	}
+
+	protected function normalizePath(string $path) : string{
+		return str_replace('/', DIRECTORY_SEPARATOR, $path);
 	}
 
 	/**
 	 * Adds a path to the lookup list
 	 *
+	 * @param string $namespacePrefix An empty string, or string ending with a backslash
 	 * @param string $path
 	 * @param bool   $prepend
 	 *
 	 * @return void
 	 */
-	public function addPath($path, $prepend = false){
-
-		foreach($this->lookup as $p){
-			if($p === $path){
-				return;
-			}
-		}
-
-		if($prepend){
-			$this->lookup->synchronized(function(string $path) : void{
-				$entries = $this->getAndRemoveLookupEntries();
-				$this->lookup[] = $path;
-				foreach($entries as $entry){
-					$this->lookup[] = $entry;
-				}
-			}, $path);
+	public function addPath(string $namespacePrefix, $path, $prepend = false){
+		$path = $this->normalizePath($path);
+		if($namespacePrefix === '' || $namespacePrefix === '\\'){
+			$this->fallbackLookup->synchronized(function() use ($path, $prepend) : void{
+				$this->appendOrPrependLookupEntry($this->fallbackLookup, $path, $prepend);
+			});
 		}else{
-			$this->lookup[] = $path;
+			$namespacePrefix = trim($namespacePrefix, '\\') . '\\';
+			$this->psr4Lookup->synchronized(function() use ($namespacePrefix, $path, $prepend) : void{
+				$list = $this->psr4Lookup[$namespacePrefix] ?? null;
+				if($list === null){
+					$list = $this->psr4Lookup[$namespacePrefix] = new \Threaded;
+				}
+				$this->appendOrPrependLookupEntry($list, $path, $prepend);
+			});
 		}
 	}
-	
+
+	protected function appendOrPrependLookupEntry(\Threaded $list, string $entry, bool $prepend) : void{
+		if($prepend){
+			$entries = $this->getAndRemoveLookupEntries($list);
+			$list[] = $entry;
+			foreach($entries as $removedEntry){
+				$list[] = $removedEntry;
+			}
+		}else{
+			$list[] = $entry;
+		}
+	}
 
 	/**
 	 * @return string[]
 	 */
-	protected function getAndRemoveLookupEntries(){
+	protected function getAndRemoveLookupEntries(\Threaded $list){
 		$entries = [];
-		while($this->lookup->count() > 0){
-			$entries[] = $this->lookup->shift();
+		while($list->count() > 0){
+			$entries[] = $list->shift();
 		}
 		return $entries;
 	}
@@ -113,13 +129,32 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 	public function findClass($name){
 		$baseName = str_replace("\\", DIRECTORY_SEPARATOR, $name);
 
-		foreach($this->lookup as $path){
+		foreach($this->fallbackLookup as $path){
 			$filename = $path . DIRECTORY_SEPARATOR . $baseName . ".php";
 			if(file_exists($filename)){
 				return $filename;
 			}
 		}
 
-		return null;
+		// PSR-4 lookup
+		$logicalPathPsr4 = $baseName . ".php";
+
+		return $this->psr4Lookup->synchronized(function() use ($name, $logicalPathPsr4) : ?string{
+			$subPath = $name;
+			while(false !== $lastPos = strrpos($subPath, '\\')){
+				$subPath = substr($subPath, 0, $lastPos);
+				$search = $subPath . '\\';
+
+				if(isset($this->psr4Lookup[$search])){
+					$pathEnd = DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $lastPos + 1);
+					foreach($this->psr4Lookup[$search] as $dir){
+						if(file_exists($file = $dir . $pathEnd)){
+							return $file;
+						}
+					}
+				}
+			}
+			return null;
+		});
 	}
 }
