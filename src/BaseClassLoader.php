@@ -28,7 +28,11 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 	}
 
 	protected function normalizePath(string $path) : string{
-		return str_replace('/', DIRECTORY_SEPARATOR, $path);
+		$parts = explode("://", $path, 2);
+		if(count($parts) === 2){
+			return $parts[0] . "://" . str_replace('/', DIRECTORY_SEPARATOR, $parts[1]);
+		}
+		return str_replace('/', DIRECTORY_SEPARATOR, $parts[0]);
 	}
 
 	/**
