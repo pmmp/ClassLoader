@@ -19,10 +19,6 @@ interface ClassLoader{
 
 	/**
 	 * Attaches the ClassLoader to the PHP runtime
-	 *
-	 * @param bool $prepend
-	 *
-	 * @return bool
 	 */
-	public function register($prepend = false);
+	public function register(bool $prepend = false) : bool;
 }

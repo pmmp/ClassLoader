@@ -47,12 +47,8 @@ class BaseClassLoader implements DynamicClassLoader{
 	 * Adds a path to the lookup list
 	 *
 	 * @param string $namespacePrefix An empty string, or string ending with a backslash
-	 * @param string $path
-	 * @param bool   $prepend
-	 *
-	 * @return void
 	 */
-	public function addPath(string $namespacePrefix, $path, $prepend = false){
+	public function addPath(string $namespacePrefix, string $path, bool $prepend = false) : void{
 		$path = $this->normalizePath($path);
 		if($namespacePrefix === '' || $namespacePrefix === '\\'){
 			$this->fallbackLookup->synchronized(function() use ($path, $prepend) : void{
@@ -85,7 +81,7 @@ class BaseClassLoader implements DynamicClassLoader{
 	/**
 	 * @return string[]
 	 */
-	protected function getAndRemoveLookupEntries(\Threaded $list){
+	protected function getAndRemoveLookupEntries(\Threaded $list) : array{
 		$entries = [];
 		while($list->count() > 0){
 			$entries[] = $list->shift();
@@ -95,12 +91,8 @@ class BaseClassLoader implements DynamicClassLoader{
 
 	/**
 	 * Attaches the ClassLoader to the PHP runtime
-	 *
-	 * @param bool $prepend
-	 *
-	 * @return bool
 	 */
-	public function register($prepend = false){
+	public function register(bool $prepend = false) : bool{
 		return spl_autoload_register(function(string $name) : void{
 			$this->loadClass($name);
 		}, true, $prepend);
@@ -108,12 +100,8 @@ class BaseClassLoader implements DynamicClassLoader{
 
 	/**
 	 * Called when there is a class to load
-	 *
-	 * @param string $name
-	 *
-	 * @return bool
 	 */
-	public function loadClass($name){
+	public function loadClass(string $name) : bool{
 		$path = $this->findClass($name);
 		if($path !== null){
 			include($path);
@@ -133,12 +121,8 @@ class BaseClassLoader implements DynamicClassLoader{
 
 	/**
 	 * Returns the path for the class, if any
-	 *
-	 * @param string $name
-	 *
-	 * @return string|null
 	 */
-	public function findClass($name){
+	public function findClass(string $name) : ?string{
 		$baseName = str_replace("\\", DIRECTORY_SEPARATOR, $name);
 
 		foreach($this->fallbackLookup as $path){

@@ -25,12 +25,6 @@ interface DynamicClassLoader extends ClassLoader{
 
 	/**
 	 * Adds a path to the lookup list
-	 *
-	 * @param string $namespacePrefix
-	 * @param string $path
-	 * @param bool   $prepend
-	 *
-	 * @return void
 	 */
-	public function addPath(string $namespacePrefix, $path, $prepend = false);
+	public function addPath(string $namespacePrefix, string $path, bool $prepend = false) : void;
 }
