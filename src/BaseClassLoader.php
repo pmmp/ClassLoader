@@ -15,6 +15,8 @@
  * GNU General Public License for more details.
 */
 
+declare(strict_types=1);
+
 class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 
 	/** @var \Threaded|string[] */
