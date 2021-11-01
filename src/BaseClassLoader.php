@@ -15,15 +15,7 @@
  * GNU General Public License for more details.
 */
 
-class BaseClassLoader implements DynamicClassLoader{
-
-	/*
-	 * Note for future maintainers: This class doesn't need to extend `Threaded` because of pthreads' serialization
-	 * trickery - the lookup Threaded objects will be shared between threads after deserialization, even though the
-	 * actual BaseClassLoader objects will be distinct (not shared).
-	 * It's done this way to bypass useless extra locking - since the BaseClassLoader itself doesn't have any
-	 * non-Threaded fields, it doesn't make any difference whether it's Threaded or not, except for performance.
-	 */
+class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 
 	/** @var \Threaded|string[] */
 	private $fallbackLookup;
