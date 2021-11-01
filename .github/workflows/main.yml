@@ -11,8 +11,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: 8.0.3
-            pthreads-version: bc16ee7b5a21faee9bd1743f830f7135b763fb56
+          - php: 8.0.12
+            pthreads-version: 4213ce7dcdc2cf1d71d63e59950e33144220dfdb
 
     name: PHP ${{ matrix.php }}
     runs-on: ubuntu-18.04
