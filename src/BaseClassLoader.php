@@ -43,11 +43,6 @@ class BaseClassLoader implements DynamicClassLoader{
 		return str_replace('/', DIRECTORY_SEPARATOR, $parts[0]);
 	}
 
-	/**
-	 * Adds a path to the lookup list
-	 *
-	 * @param string $namespacePrefix An empty string, or string ending with a backslash
-	 */
 	public function addPath(string $namespacePrefix, string $path, bool $prepend = false) : void{
 		$path = $this->normalizePath($path);
 		if($namespacePrefix === '' || $namespacePrefix === '\\'){
@@ -89,9 +84,6 @@ class BaseClassLoader implements DynamicClassLoader{
 		return $entries;
 	}
 
-	/**
-	 * Attaches the ClassLoader to the PHP runtime
-	 */
 	public function register(bool $prepend = false) : bool{
 		return spl_autoload_register(function(string $name) : void{
 			$this->loadClass($name);
