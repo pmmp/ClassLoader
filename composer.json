@@ -4,7 +4,7 @@
     "type": "library",
     "license": "LGPL-3.0",
     "require": {
-        "php": "^7.2 || ^8.0",
+        "php": "^8.0",
         "ext-pthreads": "~3.2.0",
         "ext-reflection": "*"
     },
@@ -12,7 +12,7 @@
         "phpstan/phpstan": "0.12.80",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-strict-rules": "^0.12.4",
-        "phpunit/phpunit": "^8.5 || ^9.5"
+        "phpunit/phpunit": "^9.5"
     },
     "conflict": {
         "pocketmine/spl": "<0.4"
