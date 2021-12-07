@@ -68,7 +68,7 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 	}
 
 	/**
-	 * @return string[]
+	 * @return mixed[]
 	 */
 	protected function getAndRemoveLookupEntries(\Threaded $list) : array{
 		$entries = [];
