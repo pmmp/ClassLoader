@@ -46,6 +46,7 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 		}else{
 			$namespacePrefix = trim($namespacePrefix, '\\') . '\\';
 			$this->psr4Lookup->synchronized(function() use ($namespacePrefix, $path, $prepend) : void{
+				/** @var \Threaded|null $list */
 				$list = $this->psr4Lookup[$namespacePrefix] ?? null;
 				if($list === null){
 					$list = $this->psr4Lookup[$namespacePrefix] = new \Threaded;
