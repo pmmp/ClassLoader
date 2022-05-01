@@ -128,9 +128,11 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 				$subPath = substr($subPath, 0, $lastPos);
 				$search = $subPath . '\\';
 
-				if(isset($this->psr4Lookup[$search])){
+				/** @var \Threaded|null $lookup */
+				$lookup = $this->psr4Lookup[$search] ?? null;
+				if($lookup !== null){
 					$pathEnd = DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $lastPos + 1);
-					foreach($this->psr4Lookup[$search] as $dir){
+					foreach($lookup as $dir){
 						if(file_exists($file = $dir . $pathEnd)){
 							return $file;
 						}
