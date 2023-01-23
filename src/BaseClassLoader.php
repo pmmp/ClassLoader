@@ -17,16 +17,22 @@
 
 declare(strict_types=1);
 
-class BaseClassLoader extends \Threaded implements DynamicClassLoader{
+class BaseClassLoader extends \ThreadedBase implements DynamicClassLoader{
 
-	/** @var \Threaded|string[] */
+	/**
+	 * @var \ThreadedArray|string[]
+	 * @phpstan-var \ThreadedArray<int, string>
+	 */
 	private $fallbackLookup;
-	/** @var \Threaded|string[][] */
+	/**
+	 * @var \ThreadedArray|string[][]
+	 * @phpstan-var \ThreadedArray<string, \ThreadedArray<int, string>>
+	 */
 	private $psr4Lookup;
 
 	public function __construct(){
-		$this->fallbackLookup = new \Threaded;
-		$this->psr4Lookup = new \Threaded;
+		$this->fallbackLookup = new \ThreadedArray();
+		$this->psr4Lookup = new \ThreadedArray();
 	}
 
 	protected function normalizePath(string $path) : string{
@@ -46,17 +52,19 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 		}else{
 			$namespacePrefix = trim($namespacePrefix, '\\') . '\\';
 			$this->psr4Lookup->synchronized(function() use ($namespacePrefix, $path, $prepend) : void{
-				/** @var \Threaded|null $list */
 				$list = $this->psr4Lookup[$namespacePrefix] ?? null;
 				if($list === null){
-					$list = $this->psr4Lookup[$namespacePrefix] = new \Threaded;
+					$list = $this->psr4Lookup[$namespacePrefix] = new \ThreadedArray();
 				}
 				$this->appendOrPrependLookupEntry($list, $path, $prepend);
 			});
 		}
 	}
 
-	protected function appendOrPrependLookupEntry(\Threaded $list, string $entry, bool $prepend) : void{
+	/**
+	 * @phpstan-param \ThreadedArray<int, string> $list
+	 */
+	protected function appendOrPrependLookupEntry(\ThreadedArray $list, string $entry, bool $prepend) : void{
 		if($prepend){
 			$entries = $this->getAndRemoveLookupEntries($list);
 			$list[] = $entry;
@@ -69,12 +77,15 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 	}
 
 	/**
-	 * @return mixed[]
+	 * @return string[]
+	 *
+	 * @phpstan-param \ThreadedArray<int, string> $list
+	 * @phpstan-return list<string>
 	 */
-	protected function getAndRemoveLookupEntries(\Threaded $list) : array{
+	protected function getAndRemoveLookupEntries(\ThreadedArray $list) : array{
 		$entries = [];
-		while($list->count() > 0){
-			$entries[] = $list->shift();
+		while(($entry = $list->shift()) !== null){
+			$entries[] = $entry;
 		}
 		return $entries;
 	}
@@ -127,8 +138,6 @@ class BaseClassLoader extends \Threaded implements DynamicClassLoader{
 			while(false !== $lastPos = strrpos($subPath, '\\')){
 				$subPath = substr($subPath, 0, $lastPos);
 				$search = $subPath . '\\';
-
-				/** @var \Threaded|null $lookup */
 				$lookup = $this->psr4Lookup[$search] ?? null;
 				if($lookup !== null){
 					$pathEnd = DIRECTORY_SEPARATOR . substr($logicalPathPsr4, $lastPos + 1);
