@@ -1,6 +1,6 @@
 parameters:
 	stubFiles:
-		- tests/phpstan/stubs/pthreads.stub
+		- tests/phpstan/stubs/pmmpthread.stub
 	level: 9
 	paths:
 		- src

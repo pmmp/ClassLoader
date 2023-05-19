@@ -17,22 +17,25 @@
 
 declare(strict_types=1);
 
-class BaseClassLoader extends \ThreadedBase implements DynamicClassLoader{
+use pmmp\thread\ThreadSafe;
+use pmmp\thread\ThreadSafeArray;
+
+class BaseClassLoader extends ThreadSafe implements DynamicClassLoader{
 
 	/**
-	 * @var \ThreadedArray|string[]
-	 * @phpstan-var \ThreadedArray<int, string>
+	 * @var ThreadSafeArray|string[]
+	 * @phpstan-var ThreadSafeArray<int, string>
 	 */
 	private $fallbackLookup;
 	/**
-	 * @var \ThreadedArray|string[][]
-	 * @phpstan-var \ThreadedArray<string, \ThreadedArray<int, string>>
+	 * @var ThreadSafeArray|string[][]
+	 * @phpstan-var ThreadSafeArray<string, ThreadSafeArray<int, string>>
 	 */
 	private $psr4Lookup;
 
 	public function __construct(){
-		$this->fallbackLookup = new \ThreadedArray();
-		$this->psr4Lookup = new \ThreadedArray();
+		$this->fallbackLookup = new ThreadSafeArray();
+		$this->psr4Lookup = new ThreadSafeArray();
 	}
 
 	protected function normalizePath(string $path) : string{
@@ -54,7 +57,7 @@ class BaseClassLoader extends \ThreadedBase implements DynamicClassLoader{
 			$this->psr4Lookup->synchronized(function() use ($namespacePrefix, $path, $prepend) : void{
 				$list = $this->psr4Lookup[$namespacePrefix] ?? null;
 				if($list === null){
-					$list = $this->psr4Lookup[$namespacePrefix] = new \ThreadedArray();
+					$list = $this->psr4Lookup[$namespacePrefix] = new ThreadSafeArray();
 				}
 				$this->appendOrPrependLookupEntry($list, $path, $prepend);
 			});
@@ -62,9 +65,9 @@ class BaseClassLoader extends \ThreadedBase implements DynamicClassLoader{
 	}
 
 	/**
-	 * @phpstan-param \ThreadedArray<int, string> $list
+	 * @phpstan-param ThreadSafeArray<int, string> $list
 	 */
-	protected function appendOrPrependLookupEntry(\ThreadedArray $list, string $entry, bool $prepend) : void{
+	protected function appendOrPrependLookupEntry(ThreadSafeArray $list, string $entry, bool $prepend) : void{
 		if($prepend){
 			$entries = $this->getAndRemoveLookupEntries($list);
 			$list[] = $entry;
@@ -79,10 +82,10 @@ class BaseClassLoader extends \ThreadedBase implements DynamicClassLoader{
 	/**
 	 * @return string[]
 	 *
-	 * @phpstan-param \ThreadedArray<int, string> $list
+	 * @phpstan-param ThreadSafeArray<int, string> $list
 	 * @phpstan-return list<string>
 	 */
-	protected function getAndRemoveLookupEntries(\ThreadedArray $list) : array{
+	protected function getAndRemoveLookupEntries(ThreadSafeArray $list) : array{
 		$entries = [];
 		while(($entry = $list->shift()) !== null){
 			$entries[] = $entry;
