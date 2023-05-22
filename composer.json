@@ -12,7 +12,7 @@
         "phpstan/phpstan": "1.10.15",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan-strict-rules": "^1.0",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5 || ^10.0"
     },
     "conflict": {
         "pocketmine/spl": "<0.4"
